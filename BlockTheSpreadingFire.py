@@ -1,6 +1,20 @@
 import sys
 import math
 
+def sum_score(mapXY_list, t_value, h_value):
+    score = 0
+    for yline in mapXY_list:
+        for _x in yline:
+            if _x == ".": # tree
+                score += t_value
+            elif _x == "X": # house
+                score += h_value
+            elif _x == "#":
+                score += 0
+            else:
+                print("some error !", file=sys.stderr)
+    return score
+
 # Read the constant data of the map before the main loop, then read the state of the fire and give an action at each turn
 
 # tree_treatment_duration: cooldown for cutting a "tree" cell
@@ -17,11 +31,18 @@ width, height = [int(i) for i in input().split()]
 # fire_start_x: column where the fire starts
 # fire_start_y: row where the fire starts
 fire_start_x, fire_start_y = [int(i) for i in input().split()]
+
+grid_map = []
+# map data
+
 for i in range(height):
     grid_line = input()
     # Each character represents the type of a cell.
     # '#' is a safe cell. '.' is a tree cell. 'X' is a house cell.
+    grid_map.append(grid_line)
     print(grid_line, file=sys.stderr)
+Ini_score = sum_score(grid_map, tree_value, house_value)
+print(f"Initial score = {Ini_score}", file=sys.stderr)
 
 # print Initial data
 print("Tree Treat, Fire Duration, Value ",file=sys.stderr)
@@ -44,16 +65,31 @@ while True:
     print(f"cooldown = {cooldown}", file=sys.stderr)
     print("", file=sys.stderr)
 
+    fire_map = [[] for _ in range(height)]
+    # fire progress map Initialize
+    # print(fire_map, file=sys.stderr)
+
     for i in range(height):
         for j in input().split():
-            # fire_progress: state of the fire in this cell (-2: safe, -1: no fire, 0<=.<fireDuration: fire, fireDuration: burnt)
+            # fire_progress: state of the fire in this cell
+            # (-2: safe, -1: no fire, 0<=.<fireDuration: fire, fireDuration: burnt)
             fire_progress = int(j)
-            print(f"{fire_progress:02}", end="", file=sys.stderr)
+            fire_map[i].append(fire_progress)
+            print(f"{fire_progress:2}", end="", file=sys.stderr)
         print("", file=sys.stderr)
 
+    print(fire_map, file=sys.stderr)
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
 
 
     # WAIT if your intervention cooldown is not zero, else position [x] [y] of your intervention.
-    print("WAIT")
+    if cooldown != 0:
+        print("WAIT")
+    else:
+        #print("WAIT")
+        print(f"({fire_start_x + 3}, {fire_start_y}) = {grid_map[fire_start_y][fire_start_x + 3]}", file=sys.stderr)
+        if fire_map[fire_start_y][fire_start_x + 3] == -1: # safe(-2), no fire(-1)
+            print(f"{fire_start_x + 3} {fire_start_y}")
+        else:
+            print("WAIT")
