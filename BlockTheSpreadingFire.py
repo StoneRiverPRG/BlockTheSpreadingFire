@@ -2,6 +2,16 @@ import sys
 import math
 
 def sum_score(mapXY_list, t_value, h_value):
+    """sum_score sum of all map of tree and house value
+
+    Args:
+        mapXY_list (list): map list (2 deg)
+        t_value (int): tree value
+        h_value (int): house value
+
+    Returns:
+        int: sum score
+    """
     score = 0
     for yline in mapXY_list:
         for _x in yline:
@@ -15,6 +25,28 @@ def sum_score(mapXY_list, t_value, h_value):
                 print("some error !", file=sys.stderr)
     return score
 
+
+def Area_Check(maplist, x, y):
+    wdth = len(maplist[0])
+    hght = len(maplist)
+    if (0 <= x < wdth) and (0 <= y < hght):
+        return True
+    else:
+        return False
+
+
+def Cuttable(gridmap_list, firemap_list, x, y):
+    if Area_Check(gridmap_list, x, y):
+        if gridmap_list[y][x] != "#": # not safe(#)
+            if firemap_list[y][x] == -1: # no fire(-1)
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    else:
+        return False
 # Read the constant data of the map before the main loop, then read the state of the fire and give an action at each turn
 
 # tree_treatment_duration: cooldown for cutting a "tree" cell
@@ -80,7 +112,7 @@ while True:
 
     print(fire_map, file=sys.stderr)
     # Write an action using print
-    # To debug: print("Debug messages...", file=sys.stderr, flush=True)
+    # To debug: print("Debusg messages...", file=sys.stderr, flush=True)
 
 
     # WAIT if your intervention cooldown is not zero, else position [x] [y] of your intervention.
@@ -88,8 +120,8 @@ while True:
         print("WAIT")
     else:
         #print("WAIT")
-        print(f"({fire_start_x + 3}, {fire_start_y}) = {grid_map[fire_start_y][fire_start_x + 3]}", file=sys.stderr)
-        if fire_map[fire_start_y][fire_start_x + 3] == -1: # safe(-2), no fire(-1)
-            print(f"{fire_start_x + 3} {fire_start_y}")
+        print(f"({fire_start_x + 1}, {fire_start_y}) = {grid_map[fire_start_y][fire_start_x + 1]}", file=sys.stderr)
+        if Cuttable(grid_map, fire_map, 8, 1):
+            print(f"{fire_start_x + 1} {fire_start_y}")
         else:
             print("WAIT")
