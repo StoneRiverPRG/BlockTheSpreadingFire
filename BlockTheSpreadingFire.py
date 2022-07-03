@@ -37,16 +37,35 @@ def Area_Check(maplist, x, y):
 
 def Cuttable(gridmap_list, firemap_list, x, y):
     if Area_Check(gridmap_list, x, y):
-        if gridmap_list[y][x] != "#": # not safe(#)
-            if firemap_list[y][x] == -1: # no fire(-1)
+        if (gridmap_list[y][x] != "#") and (firemap_list[y][x] == -1):
                 return True
-            else:
-                return False
         else:
             return False
-
     else:
         return False
+
+
+def Neighbor_Coord(gridmap_list, firemap_list, x, y):
+    """Neighbor_Coord fire next neighbor coordinates
+
+    Args:
+        gridmap_list (list): grid map
+        firemap_list (list): fire map
+        x (int): fire x
+        y (int): fire y
+
+    Returns:
+        list: list of tuple of fire neighbor like [(2, 2), (2, 3), ...]
+    """
+    neighbors = []
+    directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+    for direc in directions:
+        if Cuttable(gridmap_list, firemap_list, x+direc[0], y+direc[1]):
+            neighbors.append((x+direc[0], y+direc[1]))
+
+    return neighbors
+
+
 # Read the constant data of the map before the main loop, then read the state of the fire and give an action at each turn
 
 # tree_treatment_duration: cooldown for cutting a "tree" cell
@@ -120,6 +139,8 @@ while True:
         print("WAIT")
     else:
         #print("WAIT")
+        print(Neighbor_Coord(grid_map, fire_map, fire_start_x, fire_start_y), file=sys.stderr)
+        #Todo: scan map and add fire neighbors (duplicate eliminate)
         print(f"({fire_start_x + 1}, {fire_start_y}) = {grid_map[fire_start_y][fire_start_x + 1]}", file=sys.stderr)
         if Cuttable(grid_map, fire_map, 8, 1):
             print(f"{fire_start_x + 1} {fire_start_y}")
