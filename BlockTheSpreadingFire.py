@@ -1,5 +1,6 @@
 import sys
 import math
+import random
 
 def sum_score(mapXY_list, t_value, h_value):
     """sum_score sum of all map of tree and house value
@@ -114,6 +115,7 @@ while True:
     # the number of turns before you can give the instruction of cutting a cell
     # (≥ 1 means you have to WAIT / == 0 means you can give a cell to cut).
     print(f"cooldown = {cooldown}", file=sys.stderr)
+    print(f"score = {sum_score(grid_map, tree_value, house_value)}", file=sys.stderr)
     print("", file=sys.stderr)
 
     fire_map = [[] for _ in range(height)]
@@ -138,11 +140,25 @@ while True:
     if cooldown != 0:
         print("WAIT")
     else:
-        #print("WAIT")
-        print(Neighbor_Coord(grid_map, fire_map, fire_start_x, fire_start_y), file=sys.stderr)
-        #Todo: scan map and add fire neighbors (duplicate eliminate)
-        print(f"({fire_start_x + 1}, {fire_start_y}) = {grid_map[fire_start_y][fire_start_x + 1]}", file=sys.stderr)
-        if Cuttable(grid_map, fire_map, 8, 1):
-            print(f"{fire_start_x + 1} {fire_start_y}")
-        else:
+        targets = []
+        for _y, yline in enumerate(fire_map):
+            for _x, xline in enumerate(yline):
+                if xline >= 0:
+                    temp_targets = Neighbor_Coord(grid_map, fire_map, _x, _y)
+                    for temp in temp_targets:
+                        if temp not in targets:
+                            targets.append(temp)
+        print(f"targets = {targets}", file=sys.stderr)
+
+        # print(f"Neighbor {Neighbor_Coord(grid_map, fire_map, fire_start_x, fire_start_y)}", file=sys.stderr)
+        if not targets:
             print("WAIT")
+        else:
+            target_x, target_y = random.choice(targets)
+            print(f"Neighbor {Neighbor_Coord(grid_map, fire_map, target_x, target_y)}", file=sys.stderr)
+            #Todo: scan map and add fire neighbors (duplicate eliminate)
+            print(f"({target_x}, {target_y}) = {grid_map[target_y][target_x]}", file=sys.stderr)
+            if Cuttable(grid_map, fire_map, target_x, target_y):
+                print(f"{target_x} {target_y}")
+            else:
+                print("WAIT")
